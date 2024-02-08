@@ -1,7 +1,7 @@
-// src/components/CarList.js
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
+import Select from 'react-select';
 
 const CarList = () => {
   const navigate = useNavigate();
@@ -14,8 +14,18 @@ const CarList = () => {
   const [newPage, setNewPage] = useState(1);
   const pageSize = 30;
 
+  // Options for the dropdown filter
+  const filterOptions = [
+    { value: 'new', label: 'New' },
+    { value: 'used', label: 'Used' },
+    { value: 'electric', label: 'Electric' },
+    { value: 'research', label: 'Research' },
+  ];
+
+  // State to track selected option
+  const [selectedFilter, setSelectedFilter] = useState(null);
+
   useEffect(() => {
-    // Fetch cars based on the search term, filters, and pagination
     fetchCars();
   }, [location.search, newPage]);
 
@@ -33,7 +43,7 @@ const CarList = () => {
     setYearFilter(yearParam);
     setNewPage(pageParam);
 
-    axios.get(`http://localhost:5000/api/cars/search?term=${searchTermParam}&make=${makeParam}&model=${modelParam}&year=${yearParam}&page=${pageParam}&pageSize=${pageSize}`)
+    axios.get(`http://localhost:3000/api/cars/search?term=${searchTermParam}&make=${makeParam}&model=${modelParam}&year=${yearParam}&page=${pageParam}&pageSize=${pageSize}`)
       .then(response => setCars(response.data))
       .catch(error => console.error('Error fetching cars:', error));
   };
@@ -71,6 +81,18 @@ const CarList = () => {
     <div>
       <h1>Car Listings</h1>
       <div>
+        {/* Dropdown filter for "New, Used, Electric, and Research" */}
+        <Select
+          options={filterOptions}
+          value={selectedFilter}
+          onChange={(selected) => {
+            setSelectedFilter(selected);
+            handleFilter(selected.value, '', ''); // You may need to adjust this based on your backend API
+          }}
+          placeholder="Select Filter"
+        />
+      </div>
+      <div>
         <input
           type="text"
           placeholder="Search by make, model, or year"
@@ -91,6 +113,10 @@ const CarList = () => {
           </li>
         ))}
       </ul>
+      <div>
+        {/* Navigation link to the "Sell Your Car" page */}
+        <Link to="/sell-your-car">Sell Your Car</Link>
+      </div>
       <div>
         <button onClick={() => handlePageChange(newPage - 1)} disabled={newPage === 1}>
           Previous Page
