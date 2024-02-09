@@ -1,54 +1,55 @@
-// All import statements
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const { Pool } = require('pg');
-require('dotenv').config()
+require('dotenv').config();
 
-//initial express app
 const app = express();
 
-// Replace this with your database model or data
-const allCars = require('./index.js');  // Adjust based on your backend setup
+app.use(cors());
+app.use(express.json());
 
-//setup middleware
-
-app.use(cors()); //middleware for allowing cross-origin resource sharing (eg. letting our client and server communicate)
-app.use(express.json()); //built in middleware for parsing JSON sent in requests
-
-//use Pool from pg package to create database connection
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'Final_Full_Stack',
+  database: 'Cars',
   password: process.env.DB_PASSWORD,
-  port: 5432 //port you want to connect for DB connection
+  port: 5432
 });
 
-// Route for searching cars with pagination
-app.get('/api/cars/search', (req, res) => {
+const MARKETCHECK_API_KEY = 'f9589687-bd9d-49c5-b0a6-d8feb8290c4b'; // Replace with my API key
+
+app.get('/api/cars/search', async (req, res) => {
   const { term, make, model, year, page, pageSize } = req.query;
 
-  // Assuming allCars is an array of cars
-  let filteredCars = allCars.filter((car) =>
-    car.make.toLowerCase().includes(make.toLowerCase()) &&
-    car.model.toLowerCase().includes(model.toLowerCase()) &&
-    car.year.toString().includes(year) &&
-    (car.make.toLowerCase().includes(term.toLowerCase()) ||
-    car.model.toLowerCase().includes(term.toLowerCase()) ||
-    car.year.toString().includes(term))
-  );
+  try {
+    const response = await axios.get('https://marketcheck-prod.apigee.net/v2/search/car', {
+      params: {
+        api_key: MARKETCHECK_API_KEY,
+        ymmt: `${year}|${make}|${model}`, // Construct the query based on your requirements
+        rows: pageSize,
+        start: (page - 1) * pageSize,
+      },
+    });
 
-  // Apply pagination
-  const startIndex = (page - 1) * pageSize;
-  const endIndex = startIndex + parseInt(pageSize, 10);
-  const slicedResults = filteredCars.slice(startIndex, endIndex);
+    const cars = response.data.listings.map(listing => ({
+      id: listing.id,
+      year: listing.build.year,
+      make: listing.build.make,
+      model: listing.build.model,
+      trim: listing.build.trim,
+      price: listing.price,
+      // Add more properties as needed
+    }));
 
-  res.json(slicedResults);
+    res.json(cars);
+  } catch (error) {
+    console.error('Error fetching cars:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-// Start the server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
