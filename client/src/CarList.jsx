@@ -43,29 +43,11 @@ const CarList = () => {
     setYearFilter(yearParam);
     setNewPage(pageParam);
 
-
-    const apiUrl = 'https://mc-api.marketcheck.com/oauth2/token';
-    const clientId = 'f9589687-bd9d-49c5-b0a6-d8feb8290c4b';
-    const clientSecret = 'ee69b409-0c9a-4312-9a44-cf2379cd9825';
-
-    axios({
-      method: 'post',
-      url: apiUrl,
-      data: {
-        grant_type: 'client_credentials',
-        client_id: clientId,
-        client_secret: clientSecret
-      },
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => {
-        console.log('Token Response:', response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching token:', error);
-      });
+    const apiUrl = `http://localhost:3001/api/cars/search?term=${searchTermParam}&make=${makeParam}&model=${modelParam}&year=${yearParam}&page=${pageParam}&pageSize=${pageSize}`;
+    
+    axios.get(apiUrl)
+      .then(response => setCars(response.data))
+      .catch(error => console.error('Error fetching cars:', error));
   };
 
   const handleSearch = () => {
