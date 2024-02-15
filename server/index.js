@@ -10,6 +10,10 @@ const app = express();
 //MIDDELWARE THAT IS NEEDED TO CONNECT TO THE FRONT AND BACK END
 app.use(cors());
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', 'connect-src http://localhost:3000 http://localhost:3001');
+  next();
+});
 
 //SETUP DATABASE CONNECTION
 const pool = new Pool({
@@ -23,6 +27,10 @@ const pool = new Pool({
 // ROUTE TO GET ALL CARS INFO FROM DATABASE USING YOUR API NOT AN EXTERNAL ONE 
 app.get('/api/cars/search', async (req, res) => {
   const { term, make, model, year, page, pageSize } = req.query;
+  // Check if page or pageSize are not valid numbers
+  if (isNaN(page) || isNaN(pageSize) || page <= 0 || pageSize <= 0) {
+    return res.status(400).json({ error: 'Invalid page or pageSize parameters.' });
+  }
 
   try {
     const result = await pool.query(`
@@ -30,10 +38,10 @@ app.get('/api/cars/search', async (req, res) => {
       WHERE
         make ILIKE $1
         AND model ILIKE $2
-        AND year::TEXT ILIKE $3
+        AND (year::TEXT ILIKE $3 OR year = TRY_CAST($3 AS BIGINT))
       LIMIT $4 OFFSET $5;
     `, [`%${make}%`, `%${model}%`, `%${year}%`, pageSize, (page - 1) * pageSize]);
-
+  
     const cars = result.rows;
 
     res.json(cars);
