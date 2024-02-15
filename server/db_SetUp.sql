@@ -40,3 +40,20 @@ CREATE TABLE VehicleModelYear (
     year INTEGER,
     price DECIMAL(10, 2)
 );
+---------------------------------
+CREATE TABLE sedans (
+  id INT,
+  name VARCHAR(50),
+  price INT,
+  on_sale boolean
+);
+
+CREATE TABLE dealerships (
+  id INT,
+  name VARCHAR(50),
+  location VARCHAR(50),
+  price_range INT
+);
+
+INSERT INTO dealerships (id, name, location, price_range) VALUES (123,
+'best dealer around', 'palmdale', 4);
