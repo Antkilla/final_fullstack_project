@@ -48,12 +48,29 @@ CREATE TABLE sedans (
   on_sale boolean
 );
 
-CREATE TABLE dealerships (
+CREATE TABLE dealership (
   id INT,
   name VARCHAR(50),
   location VARCHAR(50),
   price_range INT
 );
 
-INSERT INTO dealerships (id, name, location, price_range) VALUES (123,
+INSERT INTO dealership (id, name, location, price_range) VALUES (123,
 'best dealer around', 'palmdale', 4);
+
+INSERT INTO dealership (id, name, location, price_range) VALUES (124,
+'auto dealer hawthorne', 'hawthorne', 2);
+
+CREATE TABLE dealership (
+    id BIGSERIAL NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    price_range INT NOT NULL
+);
+
+ALTER TABLE dealership
+ADD CONSTRAINT check_price_range
+CHECK (price_range >= 1 AND price_range <= 5);
+
+ALTER TABLE dealership
+ADD CONSTRAINT id PRIMARY KEY (id);
