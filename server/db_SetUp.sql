@@ -41,24 +41,17 @@ CREATE TABLE VehicleModelYear (
     price DECIMAL(10, 2)
 );
 ---------------------------------
-CREATE TABLE sedans (
+CREATE TABLE vehicle (
   id INT,
   name VARCHAR(50),
   price INT,
-  on_sale boolean
+  on_sale INT
 );
 
-CREATE TABLE dealership (
-  id INT,
-  name VARCHAR(50),
-  location VARCHAR(50),
-  price_range INT
-);
+INSERT INTO dealership (name, location, price_range) VALUES (
+'best dealer around', 'inglewood', 3);
 
-INSERT INTO dealership (id, name, location, price_range) VALUES (123,
-'best dealer around', 'palmdale', 4);
-
-INSERT INTO dealership (id, name, location, price_range) VALUES (124,
+INSERT INTO dealership (name, location, price_range) VALUES (
 'auto dealer hawthorne', 'hawthorne', 2);
 
 CREATE TABLE dealership (
@@ -74,3 +67,4 @@ CHECK (price_range >= 1 AND price_range <= 5);
 
 ALTER TABLE dealership
 ADD CONSTRAINT id PRIMARY KEY (id);
+
