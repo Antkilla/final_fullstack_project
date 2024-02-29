@@ -14,49 +14,92 @@ app.use(express.json());
 
 //get all dealerships
 app.get("/api/v1/dealership", async (req, res) => {
-  const results = await db.query("select * from dealership")
-  console.log(results);
-  res.status(200).json({
-    status: "success",
-    data: {
-      dealership: ["best auto dealer", "auto sports"],
-    },
-  });
+
+  try {
+    const results = await db.query("SELECT * FROM dealership")
+    
+    res.status(200).json({
+      status: "success",
+      results: results.rows.length,
+      data: { 
+        dealerships: results.rows,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
-//get a individual dealership
-app.get("/api/v1/dealership/:id", (req, res) => {
-  console.log(req.params);
-});
-
-//create dealership
-app.post("/api/v1/dealership", (req, res) => {
-  console.log(req.body);
-  res.status(201).json({
-    status: "success",
-    data: {
-      dealership: "auto sports", 
-    },
-  });
-});
-
-//UPDATE DEALERSHIP
-app.put("/api/v1/dealership/:id", (req, res) => {
+//get a dealership
+app.get("/api/v1/dealership/:id", async (req, res) => {
   console.log(req.params.id);
-  console.log(req.body);
+
+  try {
+    const results = await db.query("SELECT * FROM dealership WHERE id = $1", [req.params.id]);
+
     res.status(200).json({
       status: "success",
       data: {
-        dealership: "auto sports",
+        dealership: results.rows[0],
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//create dealership
+app.post("/api/v1/dealership", async (req, res) => {
+  console.log(req.body);
+
+  try {
+    const results = await db.query("INSERT INTO dealership(name, location, price_range) values ($1, $2, $3) returning *", 
+    [req.body.name, req.body.location, req.body.price_range])
+
+    res.status(201).json({
+      status: "success",
+      data: {
+        dealership: results.rows[0], 
+      },
+    });
+  } catch (err) {
+    console.log(err)
+  }
+});
+
+//UPDATE DEALERSHIP
+app.put("/api/v1/dealership/:id", async (req, res) => {
+
+  try {
+    const results = await db.query("UPDATE dealership SET NAME = $1, location = $2, price_range = $3 where id = $4 returning *", 
+    [req.body.name, req.body.location, req.body.price_range, req.params.id])
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        dealership: results.rows[0], 
       },
     })
+  } catch (err) {
+    console.log(err)
+  }
+  console.log(req.params.id);
+  console.log(req.body);
 });
   
 //DELETE DEALERSHIP
-app.delete("/api/v1/dealership/:id", (req, res) => {
-  res.status(204).json({
-    status: "success",
-  })
+app.delete("/api/v1/dealership/:id", async (req, res) => {
+
+  try {
+    const results = await db.query("DELETE FROM dealership WHERE id = $1",
+    [req.params.id])
+
+    res.status(204).json({
+      status: "success",
+    });  
+    } catch (err) {
+      console.log(err);
+    }
 });
 
 //SETUP DATABASE CONNECTION
