@@ -39,6 +39,7 @@ app.get("/api/v1/dealership/:id", async (req, res) => {
 
     res.status(200).json({
       status: "success",
+      results: results.rows.length,
       data: {
         dealership: results.rows[0],
       },
