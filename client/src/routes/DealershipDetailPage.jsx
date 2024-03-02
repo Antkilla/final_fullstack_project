@@ -3,11 +3,11 @@ import React from 'react'
 const DealershipDetailPage = () => {
   return (
     <div>
-        DealershipDetailPage
+        Detail Page
     </div>
   );
 };
 
-export default DealershipDetailPage
+export default DealershipDetailPage;
 
 

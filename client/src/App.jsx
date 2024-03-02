@@ -1,18 +1,18 @@
 import React from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './routes/Home';
 import UpdatePage from './routes/UpdatePage';
-import DealershipDetailPage from './routes/DealershipdetailPage';
+import DealershipDetailPage from './routes/DealershipDetailPage';
 
 const App = () => {
   return (
     <div>
         <Router>
-            <Switch>
-                <Route exact path="/" component={Home}/>
-                <Route exact path="/dealership/:id/update" component={UpdatePage}/>
-                <Route exact path="/dealership/:id" component={DealershipDetailPage}/>
-            </Switch>
+            <Routes>
+                <Route path="/" element={Home}/>
+                <Route path="/dealership/:id/update" element={UpdatePage}/>
+                <Route path="/dealership/:id" element={DealershipDetailPage}/>
+            </Routes>
         </Router>
     </div>
   );
